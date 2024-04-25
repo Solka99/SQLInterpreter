@@ -42,7 +42,7 @@ Below are the tokens defined for the SQL interpreter based on the specified gram
     LESS_OR_EQUAL = '<='
     GREATER_THAN = '>'
     GREATER_OR_EQUAL = '>='
-    NUMBER = '-?[0-9]+(\.[0-9]+)?'
+    NUMBER = '?[0-9]+(\.[0-9]+)?'
     STRING = '"[^"]*"'
     IDENTIFIER = '[A-Za-z][A-Za-z0-9_]*'
 ```
