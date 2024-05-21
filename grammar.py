@@ -178,19 +178,20 @@ def p_group_by_list(p):
 def p_opt_order_by_clause(p):
     '''opt_order_by_clause : ORDER BY order_by_list
                            | empty'''
-    p[0] = p[1]
+    p[0] = p[1:]
 
 def p_order_by_list(p):
     '''order_by_list : order_specification
                      | order_specification COMMA order_by_list'''
-    if len(p) == 2:
-        p[0] = [p[1]]
-    else:
-        p[0] = [p[1]] + p[3]
+    # if len(p) == 2:
+    #     p[0] = [p[1]]
+    # else:
+    #     p[0] = [p[1]] + p[3]
+    p[0]=p[1:]
 
 def p_order_specification(p):
     '''order_specification : column_name order_direction'''
-    p[0] = (p[1], p[2])
+    p[0] = p[1:]
 
 def p_order_direction(p):
     '''order_direction : ASC
@@ -234,7 +235,8 @@ sql3 = '''
 UPDATE table3 SET column1 = 111, column2=123
 '''
 sql3 = '''
-SELECT * FROM Products WHERE q<0 AND e>1;
+SELECT * FROM Products
+ORDER BY ProductName DESC;
 '''
 
 #przy update nie działa set column1=column2
