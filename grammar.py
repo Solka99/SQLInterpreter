@@ -165,7 +165,7 @@ def p_opt_where_clause(p):
 def p_opt_group_by_clause(p):
     '''opt_group_by_clause : GROUP BY group_by_list
                            | empty'''
-    p[0] = p[1]
+    p[0] = p[1:]
 
 def p_group_by_list(p):
     '''group_by_list : column_name
@@ -236,7 +236,7 @@ UPDATE table3 SET column1 = 111, column2=123
 '''
 sql3 = '''
 SELECT * FROM Products
-ORDER BY ProductName DESC;
+GROUP BY ProductName;
 '''
 
 #przy update nie działa set column1=column2
