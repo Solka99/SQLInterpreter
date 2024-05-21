@@ -4,41 +4,42 @@ from tokens_ import tokens# zimportowana lista tokenów
 # Definicje gramatyki
 def p_sql_statement(p):
     '''sql_statement : select_statement
+                    | insert_statement
+                    | update_statement
+                    | delete_statement
                      '''
     p[0] = p[1]
 
-# def p_sql_statement(p):
-#     '''sql_statement : select_statement
-#                      | insert_statement
-#                      | update_statement
-#                      | delete_statement'''
-#     p[0] = p[1]
-
 def p_select_statement(p):
-    '''select_statement : SELECT select_list FROM table_name opt_join_clause opt_where_clause opt_group_by_clause opt_order_by_clause'''
+    '''select_statement : SELECT select_list FROM table_name opt_join_clause opt_where_clause opt_group_by_clause opt_order_by_clause opt_semicolon'''
     p[0] = p[1:]
 
-# def p_insert_statement(p):
-#     '''insert_statement : INSERT INTO table_name LPAREN opt_column_list RPAREN VALUES LPAREN values_list RPAREN'''
-#     p[0] = ('insert', p[3], p[5], p[8])
-#
-# def p_update_statement(p):
-#     '''update_statement : UPDATE table_name SET set_list opt_where_clause'''
-#     p[0] = ('update', p[2], p[4], p[5])
-#
-# def p_delete_statement(p):
-#     '''delete_statement : DELETE FROM table_name opt_where_clause'''
-#     p[0] = ('delete', p[3], p[4])
+def p_insert_statement(p):
+    '''insert_statement : INSERT INTO table_name opt_column_list VALUES LPAREN values_list RPAREN'''
+    p[0] = p[1:]
 
+def p_update_statement(p):
+    '''update_statement : UPDATE table_name SET set_list opt_where_clause'''
+    p[0] = p[1:]
+
+def p_delete_statement(p):
+    '''delete_statement : DELETE FROM table_name opt_where_clause'''
+    p[0] = p[1:]
+
+def p_opt_semicolon(p):
+    '''opt_semicolon : SEMICOLON
+                    | empty '''
+    p[0] = p[1]
 def p_select_list(p):
     '''select_list : column_name
                    | column_name as_clause
                    | column_name COMMA select_list
-                   | aggregate_function'''
+                   | aggregate_function
+                   | ALL    '''
     if len(p) == 2:
         p[0] = [p[1]]
     elif len(p) == 3:
-        p[0] = [(p[1], p[2])]
+        p[0] = p[1:]
     elif len(p) == 4:
         p[0] = [p[1]] + p[3]
     else:
@@ -73,9 +74,9 @@ def p_set_list(p):
     '''set_list : column_name EQUALS value
                 | column_name EQUALS value COMMA set_list'''
     if len(p) == 4:
-        p[0] = [(p[1], p[3])]
+        p[0] = p[1:]
     else:
-        p[0] = [(p[1], p[3])] + p[5]
+        p[0] = p[1:4]+p[5]
 
 def p_condition(p):
     '''condition : expression
@@ -86,18 +87,20 @@ def p_condition(p):
     if len(p) == 2:
         p[0] = p[1]
     elif p[2]=='IN':
-        p[0] = ('in', p[1], p[2])
+        p[0] = p[1:]
     elif p[2] == 'BETWEEN':
         p[0] = p[1:]      #DECYZJA KTÓRE PODEJŚCIE LEPSZE
     elif p[2] == 'LIKE':
-        p[0] = ('like', p[1], p[3])
+        p[0] = p[1:]
     else:
-        p[0] = ('IS NULL', p[1])
+        p[0] = p[1:]
 
 def p_expression(p):
     '''expression : column_name comparator value
-                  | column_name comparator column_name'''
-    p[0] = (p[2], p[1], p[3])
+                  | column_name comparator column_name
+                  | column_name comparator value logical_operator expression
+                  | column_name comparator column_name logical_operator expression'''
+    p[0] = p[1:]
 
 def p_logical_operator(p):
     '''logical_operator : AND
@@ -142,7 +145,7 @@ def p_opt_join_clause(p):
 
 def p_join_clause(p):
     '''join_clause : join_type JOIN table_name ON condition'''
-    p[0] = (p[1], p[3], p[5])
+    p[0] = p[1:]
 
 def p_join_type(p):
     '''join_type : INNER
@@ -153,11 +156,14 @@ def p_join_type(p):
 def p_opt_where_clause(p):
     '''opt_where_clause : WHERE condition
                          | empty'''
-    p[0]=p[1:]
+    if p[1] is None:
+        p[0]=p[0]
+    else:
+        p[0]=p[1:]
 
 
 def p_opt_group_by_clause(p):
-    '''opt_group_by_clause : GROUP_BY group_by_list
+    '''opt_group_by_clause : GROUP BY group_by_list
                            | empty'''
     p[0] = p[1]
 
@@ -170,7 +176,7 @@ def p_group_by_list(p):
         p[0] = [p[1]] + p[3]
 
 def p_opt_order_by_clause(p):
-    '''opt_order_by_clause : ORDER_BY order_by_list
+    '''opt_order_by_clause : ORDER BY order_by_list
                            | empty'''
     p[0] = p[1]
 
@@ -197,7 +203,7 @@ def p_aggregate_function(p):
                           | AVG LPAREN column_name RPAREN
                           | MAX LPAREN column_name RPAREN
                           | MIN LPAREN column_name RPAREN'''
-    p[0] = (p[1], p[3])
+    p[0] = p[1:]
 
 def p_in_list(p):
     '''in_list : IN LPAREN values_list RPAREN'''
@@ -217,10 +223,41 @@ def p_error(p):
 # Tworzenie parsera
 parser = yacc.yacc()
 
-# Testowanie parsera
-sql = '''
-SELECT column1,abc FROM table WHERE abc = 10
+#Testowanie parsera
+# sql = '''
+# SELECT column1,abc FROM table WHERE abc LIKE "%a"
+# '''
+sql2 = '''
+DELETE FROM table1 WHERE a>1
+'''
+sql3 = '''
+UPDATE table3 SET column1 = 111, column2=123
+'''
+sql3 = '''
+SELECT * FROM Products WHERE q<0 AND e>1;
 '''
 
-result = parser.parse(sql)
+#przy update nie działa set column1=column2
+
+result = parser.parse(sql3)
 print(result)
+
+
+
+
+#result = parser.parse("select datepart(year, '2017-12-03') from a;")
+result = parser.parse("SELECT productid,lll, kkk from q where q>0")
+print(result)
+#result = parser.parse("select distinct id from a intersect select id from b;")
+#result = parser.parse("SELECT * from customers where a NOT IN (select customerid from orders);")
+#result = parser.parse("SELECT x from a where a between a and abs(-6);")
+#result = parser.parse("SELECT COALESCE(NULL, NULL, NULL, 'W3Schools.com', NULL, 'Example.com') from a;")
+#result = parser.parse("SELECT CASE WHEN Quantity > 30 THEN x WHEN Quantity = 30 THEN 'The quantity is 30' END FROM OrderDetails;")
+#result = parser.parse("CREATE FUNCTION a (arg1 int) returns int language plpgsql as $$ declare x int; begin 'aaa' end; $$;")
+#result = parser.parse("create schema employee;")
+#result = parser.parse("select distinct a from b;")
+#result = parser.parse("DELETE FROM table_name WHERE x>y;")
+#result = parser.parse("SELECT column1 FROM table1 EXCEPT SELECT column1 FROM table2;")
+#result = parser.parse("ALTER TABLE table_name ADD COLUMN column_name int;")
+
+#result = parser.parse("SELECT * from customers where a NOT IN (select customerid from orders);\nSELECT * from customers where a NOT IN (select customerid from orders);")

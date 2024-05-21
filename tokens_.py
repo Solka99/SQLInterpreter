@@ -2,12 +2,12 @@ import ply.lex as lex
 
 # Lista nazw tokenów
 tokens = (
-    'SELECT', 'FROM', 'WHERE', 'IN', 'BETWEEN', 'LIKE', 'IS_NULL', 'AS',
-    'JOIN', 'ON', 'AND', 'OR', 'ORDER_BY', 'GROUP_BY', 'INNER', 'LEFT',
+    'SELECT', 'FROM', 'WHERE', 'IN', 'BETWEEN', 'LIKE', 'AS',
+    'JOIN', 'ON', 'AND', 'OR', 'ORDER', 'BY', 'GROUP', 'INNER', 'LEFT',
     'RIGHT', 'ASC', 'DESC', 'COUNT', 'SUM', 'AVG', 'MAX', 'MIN', 'COMMA',
     'SEMICOLON', 'DOT', 'LPAREN', 'RPAREN', 'EQUALS', 'NOT_EQUALS',
     'LESS_THAN', 'LESS_OR_EQUAL', 'GREATER_THAN', 'GREATER_OR_EQUAL',
-    'NUMBER', 'STRING', 'IDENTIFIER', 'INSERT_INTO','BOOLEAN','IS','NULL'
+    'NUMBER', 'STRING', 'IDENTIFIER', 'INSERT', 'INTO','BOOLEAN','IS','NULL','UPDATE','SET','DELETE','VALUES','ALL'
 )
 
 # Definicje reguł leksykalnych
@@ -24,8 +24,9 @@ t_JOIN = r'JOIN'
 t_ON = r'ON'
 t_AND = r'AND'
 t_OR = r'OR'
-t_ORDER_BY = r'ORDER BY'
-t_GROUP_BY = r'GROUP BY'
+t_ORDER = r'ORDER'
+t_GROUP = r'GROUP'
+t_BY = r'BY'
 t_INNER = r'INNER'
 t_LEFT = r'LEFT'
 t_RIGHT = r'RIGHT'
@@ -47,8 +48,14 @@ t_LESS_THAN = r'<'
 t_LESS_OR_EQUAL = r'<='
 t_GREATER_THAN = r'>'
 t_GREATER_OR_EQUAL = r'>='
-t_INSERT_INTO=r'INSERT INTO'
+t_INSERT=r'INSERT'
+t_INTO=r'INTO'
 t_BOOLEAN=r'BOOLEAN'
+t_UPDATE=r'UPDATE'
+t_SET=r'SET'
+t_DELETE=r'DELETE'
+t_VALUES=r'VALUES'
+t_ALL=r'\*'
 
 def t_NUMBER(t):
     r'[0-9]+(\.[0-9]+)?'
@@ -92,12 +99,19 @@ def t_error(t):
 # Tworzenie leksyka
 lexer = lex.lex()
 
-# # Testowanie leksyka
-# data = '''
-# SELECT column1, column2 FROM table WHERE column1 IS NULL;
-# '''
+# Testowanie leksyka
+data = '''
+SELECT column1, column2 FROM table WHERE column1 IS NULL;
+'''
+data2 = '''
+UPDATE table1 SET column1 = "Anna"
+'''
+data3='''
+SELECT * FROM Products
+ORDER BY Price;
+'''
 #
-# lexer.input(data)
+# lexer.input(data3)
 #
 # # Tokeny z leksyka
 # for tok in lexer:
