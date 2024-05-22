@@ -1,5 +1,6 @@
 # Interpreter SQL z interfejsem graficznym
 Dane studentów: Alicja Solarz, Katarzyna Woźniak, Bartosz Zieliński
+
 Dane kontaktowe: alicjasol@student.agh.edu.pl
 
 ## Założenia programu - krótki opis
