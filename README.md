@@ -45,8 +45,7 @@ Do stworzenia GUI planujemy użycie Flask'a. Interfejs będzie zawierał:
 - Przycisk do wykonania zapytania.
 - Tabelę do wyświetlania wyników zapytań.
 
-## Tokens
-Below are the tokens defined for the SQL interpreter based on the specified grammar:
+## Tokeny
 
 ```
     SELECT = 'SELECT'
@@ -89,8 +88,7 @@ Below are the tokens defined for the SQL interpreter based on the specified gram
     IDENTIFIER = '[A-Za-z][A-Za-z0-9_]*'
 ```
 
-## Grammar
-The grammar used for the SQL interpreter is as follows:
+## Gramatyka
 
 ```
 <sql-statement> ::= <select-statement> | <insert-statement> | <update-statement> | <delete-statement>
