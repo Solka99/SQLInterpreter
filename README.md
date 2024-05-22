@@ -150,9 +150,6 @@ Do stworzenia GUI planujemy użycie Flask'a. Interfejs będzie zawierał:
 <pattern> ::= <string>
 ```
 
-#### Informacje o stosowanych generatorach skanerów/parserów, pakietach zewnętrznych
-# TODO
-
 #### Krótka instrukcja obsługi
 W polu tekstowym należy wpisać zapytanie w języku SQL, które chcemy wykonać. Aby to się stało, należy wcisnąć klawisz ENTER lub kliknąć przycisk "Wykonaj zapytanie". Jeżeli zapytanie jest poprawne składniowo, to wyświetli się tabela, która jest wynikiem naszego zapytania. Jeśli zapytanie jest niepoprawne, wyświetli się komunikat "Błąd przy wykonywaniu zapytania".
 
