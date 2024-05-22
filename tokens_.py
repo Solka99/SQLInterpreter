@@ -70,7 +70,6 @@ def t_STRING(t):
     t.value = t.value[1:-1]  # Usuwa cudzysłowy
     return t
 
-
 def t_IDENTIFIER(t):
     r'[A-Za-z][A-Za-z0-9_]*'
     if t.value.upper() in tokens:
@@ -79,40 +78,18 @@ def t_IDENTIFIER(t):
         t.type = 'IDENTIFIER'
     return t
 
-
 # Ignorowanie białych znaków
 t_ignore = ' \t'
-
 
 # Reguła dla nowej linii
 def t_newline(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
 
-
 # Obsługa błędów
 def t_error(t):
     print(f"Nieznany znak '{t.value[0]}'")
     t.lexer.skip(1)
 
-
 # Tworzenie leksyka
 lexer = lex.lex()
-
-# Testowanie leksyka
-data = '''
-SELECT column1, column2 FROM table WHERE column1 IS NULL;
-'''
-data2 = '''
-UPDATE table1 SET column1 = "Anna"
-'''
-data3='''
-SELECT * FROM Products
-ORDER BY Price;
-'''
-#
-# lexer.input(data3)
-#
-# # Tokeny z leksyka
-# for tok in lexer:
-#     print(tok)
