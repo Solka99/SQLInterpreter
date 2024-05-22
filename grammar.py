@@ -16,15 +16,15 @@ def p_select_statement(p):
     p[0] = ' '.join([str(x) for x in p[1:] if x])
 
 def p_insert_statement(p):
-    '''insert_statement : INSERT INTO table_name opt_column_list VALUES LPAREN values_list RPAREN'''
+    '''insert_statement : INSERT INTO table_name opt_column_list VALUES LPAREN values_list RPAREN opt_semicolon'''
     p[0] = ' '.join([str(x) for x in p[1:] if x])
 
 def p_update_statement(p):
-    '''update_statement : UPDATE table_name SET set_list opt_where_clause'''
+    '''update_statement : UPDATE table_name SET set_list opt_where_clause opt_semicolon'''
     p[0] = ' '.join([str(x) for x in p[1:] if x])
 
 def p_delete_statement(p):
-    '''delete_statement : DELETE FROM table_name opt_where_clause'''
+    '''delete_statement : DELETE FROM table_name opt_where_clause opt_semicolon'''
     p[0] = ' '.join([str(x) for x in p[1:] if x])
 
 def p_opt_semicolon(p):
@@ -223,3 +223,7 @@ def p_error(p):
 
 # Tworzenie parsera
 parser = yacc.yacc()
+
+
+result = parser.parse('select major from students where major=\'Physics\'')
+print(result)

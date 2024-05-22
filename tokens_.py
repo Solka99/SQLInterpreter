@@ -50,7 +50,7 @@ t_GREATER_THAN = r'>'
 t_GREATER_OR_EQUAL = r'>='
 t_INSERT=r'INSERT'
 t_INTO=r'INTO'
-t_BOOLEAN=r'BOOLEAN'
+# t_BOOLEAN=r'BOOLEAN'
 t_UPDATE=r'UPDATE'
 t_SET=r'SET'
 t_DELETE=r'DELETE'
@@ -66,8 +66,10 @@ def t_NUMBER(t):
     return t
 
 def t_STRING(t):
-    r'"[^"]*"'
-    t.value = t.value[1:-1]  # Usuwa cudzysłowy
+    r'\'[A-Za-z][A-Za-z0-9_]*\''
+    return t
+def t_BOOLEAN(t):
+    r'\b(TRUE|FALSE)\b'
     return t
 
 def t_IDENTIFIER(t):
@@ -93,3 +95,8 @@ def t_error(t):
 
 # Tworzenie leksyka
 lexer = lex.lex()
+
+lexer.input('select major from students where major=\'Physics\'')
+
+for tok in lexer:
+    print(tok)
