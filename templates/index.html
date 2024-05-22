@@ -1,10 +1,125 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interpreter SQL</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f8ff;
+        }
+        #query-container {
+            margin-bottom: 20px;
+        }
+        #query-container textarea {
+            width: 100%;
+            height: 100px;
+            border: 2px solid #007bff;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: #e6f7ff;
+        }
+        #query-container button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #query-container button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            text-align: left;
+        }
+        tr:nth-child(even) {
+            background-color: #e6f7ff;
+        }
+        tr:hover {
+            background-color: #cce5ff;
+        }
+    </style>
 </head>
 <body>
- AAAAA
+
+<h2>Interpreter SQL</h2>
+
+<div id="query-container">
+    <textarea id="sql-query" placeholder="Wpisz swoje zapytanie SQL tutaj..."></textarea>
+    <button onclick="executeQuery()">Wykonaj zapytanie</button>
+</div>
+
+<div id="result-container"></div>
+
+<script>
+    document.getElementById('sql-query').addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            executeQuery();
+        }
+    });
+
+    function executeQuery() {
+        const query = document.getElementById('sql-query').value;
+
+        fetch('/execute-query', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ query: query }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            displayResults(data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('result-container').innerHTML = '<p>Błąd przy wykonywaniu zapytania</p>';
+        });
+    }
+
+    function displayResults(data) {
+        if (data.error) {
+            document.getElementById('result-container').innerHTML = `<p>${data.error}</p>`;
+            return;
+        }
+
+        let table = '<table><thead><tr>';
+        for (const column of data.columns) {
+            table += `<th>${column}</th>`;
+        }
+        table += '</tr></thead><tbody>';
+
+        for (const row of data.rows) {
+            table += '<tr>';
+            for (const cell of row) {
+                table += `<td>${cell}</td>`;
+            }
+            table += '</tr>';
+        }
+        table += '</tbody></table>';
+
+        document.getElementById('result-container').innerHTML = table;
+    }
+</script>
+
 </body>
 </html>
