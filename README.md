@@ -54,14 +54,14 @@ Do stworzenia GUI planujemy użycie Flask'a. Interfejs będzie zawierał:
     IN = 'IN'
     BETWEEN = 'BETWEEN'
     LIKE = 'LIKE'
-    IS_NULL = 'IS NULL'
     AS = 'AS'
     JOIN = 'JOIN'
     ON = 'ON'
     AND = 'AND'
     OR = 'OR'
-    ORDER_BY = 'ORDER BY'
-    GROUP_BY = 'GROUP BY'
+    ORDER = 'ORDER'
+    BY = 'BY'
+    GROUP = 'GROUP'
     INNER = 'INNER'
     LEFT = 'LEFT'
     RIGHT = 'RIGHT'
@@ -86,68 +86,90 @@ Do stworzenia GUI planujemy użycie Flask'a. Interfejs będzie zawierał:
     NUMBER = '[0-9]+(\.[0-9]+)?'
     STRING = '"[^"]*"'
     IDENTIFIER = '[A-Za-z][A-Za-z0-9_]*'
+    INSERT =  'INSERT'
+    INTO = 'INTO'
+    BOOLEAN = 'BOOLEAN'
+    IS = 'IS'
+    NULL = 'NULL'
+    UPDATE = 'UPDATE'
+    SET = 'SET'
+    DELETE = 'DELETE'
+    VALUES = 'VALUES'
+    ALL = '\*'
 ```
 
 ## Gramatyka
 
 ```
-<sql-statement> ::= <select-statement> | <insert-statement> | <update-statement> | <delete-statement>
+<sql_statement> ::= <select_statement> | <insert_statement> | <update_statement> | <delete_statement>
 
-<select-statement> ::= SELECT <select-list> FROM <table-name> [<join-clause>] [WHERE <condition>] [GROUP BY <group-by-list>] [ORDER BY <order-by-list>]
+<select_statement> ::= SELECT <select_list> FROM <table_name> <opt_join_clause> <opt_where_clause> <opt_group_by_clause> <opt_order_by_clause> <opt_semicolon>
 
-<insert-statement> ::= INSERT INTO <table-name> [(<column-list>)] VALUES (<values-list>)
+<insert_statement> ::= INSERT INTO <table_name> (<opt_column_list>) VALUES (<values_list>)
 
-<update-statement> ::= UPDATE <table-name> SET <set-list> [WHERE <condition>]
+<update_statement> ::= UPDATE <table-name> SET <set-list> <opt_where-clause>
 
-<delete-statement> ::= DELETE FROM <table-name> [WHERE <condition>]
+<delete_statement> ::= DELETE FROM <table-name> <opt_where-clause>
 
-<select-list> ::= <column-name> | <column-name> <as-clause> | <column-name>, <select-list> | <aggregate-function>
+<opt_semicolon> ::= SEMICOLON | <empty>
 
-<column-list> ::= <column-name> | <column-name>, <column-list>
+<select_list> ::= <column-name> | <column-name> <as-clause> | <column-name>, <select-list> | <aggregate-function> | ALL
 
-<values-list> ::= <value> | <value>, <values-list>
+<column_list> ::= (<column_name_list>)
 
-<set-list> ::= <column-name> = <value> | <column-name> = <value>, <set-list>
+<column_name_list> ::= <column_name> | <column_name> COMMA <column_name_list>
 
-<condition> ::= <expression> [<logical-operator> <condition>] | <column-name> <in-list> | <column-name> BETWEEN <value> AND <value> | <column-name> LIKE <pattern> | <column-name> IS NULL
+<opt_column_list> ::= <empty> | <column_list>
 
-<expression> ::= <column-name> <comparator> <value> | <column-name> <comparator> <column-name>
+<values_list> ::= <value> | <value>, <values_list>
 
-<logical-operator> ::= AND | OR
+<set_list> ::= <column_name> = <value> | <column_name> = <value>, <set_list>
+
+<condition> ::= <expression> | <column_name> <in_list> | <column_name> BETWEEN <value> AND <value> | <column_name> LIKE <pattern> | <column_name> IS NULL
+
+<expression> ::= <column_name> <comparator> <value> | <column_name> <comparator> <column_name> | <column_name> <comparator> <value> <logical_operator> <expression> | <column_name> <comparator> <column_name> <logical_operator> <expression>
+
+<logical_operator> ::= AND | OR
 
 <comparator> ::= = | != | < | <= | > | >=
 
 <value> ::= <number> | <string> | <boolean>
 
-<table-name> ::= <identifier>
+<table_name> ::= IDENTIFIER
 
-<column-name> ::= <identifier>
+<column_name> ::= IDENTIFIER
 
-<identifier> ::= <letter> [<letter-or-digit> ...]
+<as_clause> ::= AS IDENTIFIER
 
-<letter> ::= [A-Za-z]
+<opt_join_clause> ::= <join_clause> | <empty>
 
-<letter-or-digit> ::= <letter> | [0-9]
+<join_clause> ::= <join_type> JOIN <table_name> ON <condition>
 
-<as-clause> ::= AS <identifier>
+<join_type> ::= INNER | LEFT | RIGHT
 
-<join-clause> ::= <join-type> JOIN <table-name> ON <condition>
+<opt_where_clause> ::= WHERE <condition> | <empty>
 
-<join-type> ::= INNER | LEFT | RIGHT
+<opt_group_by_clause> ::= GROUP BY <group_by_list> | <empty>
 
-<group-by-list> ::= <column-name> | <column-name>, <group-by-list>
+<group_by_list> ::= <column_name> | <column_name>, <group_by_list>
 
-<order-by-list> ::= <order-specification> | <order-specification>, <order-by-list>
+<opt_order_by_clause> ::= ORDER BY <order_by_list> | <empty>
 
-<order-specification> ::= <column-name> <order-direction>
+<order_by_list> ::= <order_specification> | <order_specification>, <order_by_list>
 
-<order-direction> ::= ASC | DESC
+<order_specification> ::= <column_name> <order_direction>
 
-<aggregate-function> ::= COUNT(<column-name>) | SUM(<column-name>) | AVG(<column-name>) | MAX(<column-name>) | MIN(<column-name>)
+<order_direction> ::= ASC | DESC
 
-<in-list> ::= IN (<value-list>)
+<aggregate_function> ::= COUNT(<column_name>) | SUM(<column_name>) | AVG(<column_name>) | MAX(<column_name>) | MIN(<column_name>)
 
-<pattern> ::= <string>
+<in_list> ::= IN (<value_list>)
+
+<pattern> ::= STRING
+
+<empty> ::= 
+
+<error> ::=     print(f"Syntax error at '{p.value}'")
 ```
 
 #### Krótka instrukcja obsługi
