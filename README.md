@@ -169,7 +169,6 @@ Do stworzenia GUI planujemy użycie Flask'a. Interfejs będzie zawierał:
 
 <empty> ::= 
 
-<error> ::=     print(f"Syntax error at '{p.value}'")
 ```
 
 #### Krótka instrukcja obsługi
