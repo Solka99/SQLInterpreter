@@ -12,8 +12,11 @@ def index():
 def execute_query_route():
     data = request.get_json()
     sql_query = data.get('query', '')
-    parsed_query = grammar.parser.parse(sql_query)
-    result = execute_query(parsed_query)
+    try:
+        parsed_query = grammar.parser.parse(sql_query)
+        result = execute_query(parsed_query)
+    except SyntaxError as e:
+        result = {"error": str(e)}
     return jsonify(result)
 
 if __name__ == "__main__":

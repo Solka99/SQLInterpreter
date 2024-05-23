@@ -219,11 +219,11 @@ def p_empty(p):
     p[0] = ''
 
 def p_error(p):
-    print(f"Syntax error at '{p.value}'")
+    if p:
+        error_message = f"Syntax error at '{p.value}'"
+    else:
+        error_message = "Syntax error at EOF"
+    raise SyntaxError(error_message)
 
 # Tworzenie parsera
 parser = yacc.yacc()
-
-
-result = parser.parse('select major from students where major=\'Physics\'')
-print(result)
