@@ -101,7 +101,7 @@ Do stworzenia GUI planujemy użycie Flask'a. Interfejs będzie zawierał:
 ## Gramatyka
 
 ```
-<sql_statement> ::= <select_statement> | <insert_statement> | <update_statement> | <delete_statement>
+<sql_statement> ::= <select_statement> | <insert_statement> | <update_statement> | <delete_statement> | <select_statement>
 
 <select_statement> ::= SELECT <select_list> FROM <table_name> <opt_join_clause> <opt_where_clause> <opt_group_by_clause> <opt_order_by_clause> <opt_semicolon>
 
