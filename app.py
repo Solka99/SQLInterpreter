@@ -20,11 +20,13 @@ def execute_query_route():
     #     result = {"error": str(e)}
     # return jsonify(result)
     try:
-        parsed_queries = grammar.parser.parse(sql_query)  # Zakładamy, że zwraca listę zapytań
+        parsed_queries = grammar.parser.parse(sql_query)
         results = []
         for query in parsed_queries:
             result = execute_query(query)
             results.append(result)
+    except NameError as e:
+        results = [{"error": str(e)}]
     except SyntaxError as e:
         results = [{"error": str(e)}]
     return jsonify(results)

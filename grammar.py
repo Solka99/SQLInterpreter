@@ -1,7 +1,7 @@
 import ply.yacc as yacc
 from tokens_ import tokens
-#from functions import execute_query  # Import funkcji execute_query
 
+current_table_name = None
 
 # Definicje gramatyki
 def p_statements(p):
@@ -155,8 +155,9 @@ def p_value(p):
 
 def p_table_name(p):
     '''table_name : identifier'''
+    global current_table_name
+    current_table_name = p[1]
     p[0] = p[1]
-
 
 def p_column_name(p):
     '''column_name : identifier'''
@@ -302,10 +303,7 @@ def p_error(p):
 
 # Tworzenie parsera
 parser = yacc.yacc()
-# def parse_sql(query):
-#     try:
-#         a=parser.parse(query)
-#         print(a)
-#     except SyntaxError as e:
-#         raise e
-# # parse_sql("select * from students; select name from students;")
+
+def update():
+    parser = yacc.yacc()
+    return current_table_name
