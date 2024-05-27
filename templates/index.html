@@ -96,28 +96,65 @@
         });
     }
 
+    {#function displayResults(data) {#}
+    {#    if (data.error) {#}
+    {#        document.getElementById('result-container').innerHTML = `<p>${data.error}</p>`;#}
+    {#        return;#}
+    {#    }#}
+    {##}
+    {#    let table = '<table><thead><tr>';#}
+    {#    for (const column of data.columns) {#}
+    {#        table += `<th>${column}</th>`;#}
+    {#    }#}
+    {#    table += '</tr></thead><tbody>';#}
+    {##}
+    {#    for (const row of data.rows) {#}
+    {#        table += '<tr>';#}
+    {#        for (const cell of row) {#}
+    {#            table += `<td>${cell}</td>`;#}
+    {#        }#}
+    {#        table += '</tr>';#}
+    {#    }#}
+    {#    table += '</tbody></table>';#}
+    {##}
+    {#    document.getElementById('result-container').innerHTML = table;#}
+    {##}
     function displayResults(data) {
+        const resultsContainer = document.getElementById('result-container');
+        resultsContainer.innerHTML = '';
+
         if (data.error) {
-            document.getElementById('result-container').innerHTML = `<p>${data.error}</p>`;
+            resultsContainer.innerHTML = `<p>${data.error}</p>`;
             return;
         }
 
-        let table = '<table><thead><tr>';
-        for (const column of data.columns) {
-            table += `<th>${column}</th>`;
-        }
-        table += '</tr></thead><tbody>';
+        data.forEach((result, index) => {
+            const resultContainer = document.createElement('div');
+            resultContainer.className = 'result-container';
 
-        for (const row of data.rows) {
-            table += '<tr>';
-            for (const cell of row) {
-                table += `<td>${cell}</td>`;
+            if (result.error) {
+                resultContainer.innerHTML = `<p>Błąd w zapytaniu ${index + 1}: ${result.error}</p>`;
+            } else {
+                let table = '<table><thead><tr>';
+                for (const column of result.columns) {
+                    table += `<th>${column}</th>`;
+                }
+                table += '</tr></thead><tbody>';
+
+                for (const row of result.rows) {
+                    table += '<tr>';
+                    for (const cell of row) {
+                        table += `<td>${cell}</td>`;
+                    }
+                    table += '</tr>';
+                }
+                table += '</tbody></table>';
+
+                resultContainer.innerHTML = `<h3>Wynik zapytania ${index + 1}</h3>` + table;
             }
-            table += '</tr>';
-        }
-        table += '</tbody></table>';
 
-        document.getElementById('result-container').innerHTML = table;
+            resultsContainer.appendChild(resultContainer);
+        });
     }
 </script>
 

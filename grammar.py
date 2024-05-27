@@ -4,32 +4,40 @@ from tokens_ import tokens
 
 
 # Definicje gramatyki
+def p_statements(p):
+    '''statements : sql_statement SEMICOLON statements
+                  | sql_statement opt_semicolon'''
+    if len(p) == 4:
+        p[0] = [p[1] + ';'] + p[3]
+    else:
+        p[0] = [p[1] + p[2]]
+
+
 def p_sql_statement(p):
     '''sql_statement : select_statement
-                    | insert_statement
-                    | update_statement
-                    | delete_statement
-                     '''
+                     | insert_statement
+                     | update_statement
+                     | delete_statement'''
     p[0] = p[1]
 
 
 def p_select_statement(p):
-    '''select_statement : SELECT select_list FROM table_name opt_join_clause opt_where_clause opt_group_by_clause opt_order_by_clause opt_semicolon'''
+    '''select_statement : SELECT select_list FROM table_name opt_join_clause opt_where_clause opt_group_by_clause opt_order_by_clause '''
     p[0] = ' '.join([str(x) for x in p[1:] if x])
 
 
 def p_insert_statement(p):
-    '''insert_statement : INSERT INTO table_name opt_column_list VALUES LPAREN values_list RPAREN opt_semicolon'''
+    '''insert_statement : INSERT INTO table_name opt_column_list VALUES LPAREN values_list RPAREN '''
     p[0] = ' '.join([str(x) for x in p[1:] if x])
 
 
 def p_update_statement(p):
-    '''update_statement : UPDATE table_name SET set_list opt_where_clause opt_semicolon'''
+    '''update_statement : UPDATE table_name SET set_list opt_where_clause '''
     p[0] = ' '.join([str(x) for x in p[1:] if x])
 
 
 def p_delete_statement(p):
-    '''delete_statement : DELETE FROM table_name opt_where_clause opt_semicolon'''
+    '''delete_statement : DELETE FROM table_name opt_where_clause '''
     p[0] = ' '.join([str(x) for x in p[1:] if x])
 
 
@@ -294,8 +302,10 @@ def p_error(p):
 
 # Tworzenie parsera
 parser = yacc.yacc()
-def parse_sql(query):
-    try:
-        parser.parse(query)
-    except SyntaxError as e:
-        raise e
+# def parse_sql(query):
+#     try:
+#         a=parser.parse(query)
+#         print(a)
+#     except SyntaxError as e:
+#         raise e
+# # parse_sql("select * from students; select name from students;")

@@ -96,7 +96,7 @@ def t_error(t):
 # Tworzenie leksyka
 lexer = lex.lex()
 
-lexer.input('select major from students where major=\'Physics\'')
-
-for tok in lexer:
-    print(tok)
+# lexer.input('select major from students where major=\'Physics\'')
+#
+# for tok in lexer:
+#     print(tok)
