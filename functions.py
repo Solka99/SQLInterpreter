@@ -31,4 +31,13 @@ def check_if_table_name_correct(current_table_name_):
 
 #Queries to test
 #1 SELECT name AS student_name FROM students;
-#2
+#2 select * from students2 where name='Kasia';
+#3 update students set major='Computer Science' where age=21; select * from students;
+#4 SELECT name, age FROM students ORDER BY age DESC;
+#5 SELECT * FROM students WHERE major LIKE 'M%';
+#6 SELECT count(*) from students where age>20; select * from students
+#7 SELECT major,avg(age) as average_age FROM students GROUP BY major;
+#8 SELECT * FROM students WHERE age = (SELECT MIN(age) FROM students) or age = (SELECT max(age) FROM students)
+
+
+

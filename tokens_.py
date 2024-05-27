@@ -66,7 +66,8 @@ def t_NUMBER(t):
     return t
 
 def t_STRING(t):
-    r'\'[A-Za-z][A-Za-z0-9_]*\''
+    #r'\'[A-Za-z][A-Za-z0-9_]*\''
+    r'\'(?:[^\']|\'\')*\''
     return t
 def t_BOOLEAN(t):
     r'\b(TRUE|FALSE)\b'
