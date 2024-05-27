@@ -38,6 +38,10 @@ def check_if_table_name_correct(current_table_name_):
 #6 SELECT count(*) from students where age>20; select * from students
 #7 SELECT major,avg(age) as average_age FROM students GROUP BY major;
 #8 SELECT * FROM students WHERE age = (SELECT MIN(age) FROM students) or age = (SELECT max(age) FROM students)
+#9 SELECT major, AVG(age) AS average_age
+#FROM students
+#GROUP BY major
+#HAVING avg(age) > 20;
 
 
 

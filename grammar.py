@@ -22,7 +22,7 @@ def p_sql_statement(p):
 
 
 def p_select_statement(p):
-    '''select_statement : SELECT select_list FROM table_name opt_join_clause opt_where_clause opt_group_by_clause opt_order_by_clause '''
+    '''select_statement : SELECT opt_distinct select_list FROM table_name opt_join_clause opt_where_clause opt_group_by_clause opt_order_by_clause opt_limit_clause '''
     p[0] = ' '.join([str(x) for x in p[1:] if x])
 
 
@@ -67,7 +67,10 @@ def p_select_list(p):
     #     p[0] = ' '.join([str(x) for x in p[1:] if x])
     p[0] = ' '.join([str(x) for x in p[1:] if x])
 
-
+def p_opt_distinct(p):
+    '''opt_distinct : DISTINCT
+                    | empty'''
+    p[0]=p[1]
 def p_column_list(p):
     '''column_list : LPAREN column_name_list RPAREN'''
     p[0] = f"({p[2]})"
@@ -87,6 +90,10 @@ def p_opt_column_list(p):
                        | column_list'''
     p[0] = p[1] if p[1] else ''
 
+def p_opt_limit_clause(p):
+    '''opt_limit_clause : LIMIT NUMBER
+                        | empty'''
+    p[0] = f"LIMIT {p[2]}" if p[1] else ''
 
 def p_values_list(p):
     '''values_list : value
@@ -170,8 +177,12 @@ def p_table_name(p):
     p[0] = p[1]
 
 def p_column_name(p):
-    '''column_name : identifier'''
-    p[0] = p[1]
+    '''column_name : identifier
+                    | table_name DOT identifier'''
+    if len(p)==2:
+        p[0] = p[1]
+    else:
+        p[0]=f"{p[1]} . {p[2]}"
 
 
 def p_identifier(p):
@@ -209,9 +220,10 @@ def p_opt_where_clause(p):
 
 
 def p_opt_group_by_clause(p):
-    '''opt_group_by_clause : GROUP BY group_by_list
+    '''opt_group_by_clause : GROUP BY group_by_list opt_having_clause
                            | empty'''
-    p[0] = f"GROUP BY {p[3]}" if p[1] else ''
+    p[0] = ' '.join([str(x) for x in p[1:] if x])
+
 
 
 def p_group_by_list(p):
@@ -222,6 +234,17 @@ def p_group_by_list(p):
     else:
         p[0] = f"{p[1]}, {p[3]}"
 
+def p_opt_having_clause(p):
+    '''opt_having_clause : HAVING condition
+                         | HAVING aggregate_function having_expression
+                         | empty'''
+    p[0] = ' '.join([str(x) for x in p[1:] if x])
+
+def p_having_expression(p):
+    '''having_expression : comparator value
+                  | comparator value logical_operator expression
+                  | comparator LPAREN select_statement RPAREN
+                  | comparator LPAREN select_statement RPAREN logical_operator expression '''
 
 def p_opt_order_by_clause(p):
     '''opt_order_by_clause : ORDER BY order_by_list
@@ -318,3 +341,5 @@ def update():
         pass
     return current_table_name
 
+# print(parser.parse("SELECT students.name, students.age, departments.name FROM students JOIN departments ON "
+#                    "students.department_id = departments.id;"))
