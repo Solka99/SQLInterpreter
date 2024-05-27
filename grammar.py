@@ -1,36 +1,51 @@
 import ply.yacc as yacc
 from tokens_ import tokens
-from functions import execute_query  # Import funkcji execute_query
+
+current_table_name = None
 
 # Definicje gramatyki
+def p_statements(p):
+    '''statements : sql_statement SEMICOLON statements
+                  | sql_statement opt_semicolon'''
+    if len(p) == 4:
+        p[0] = [p[1] + ';'] + p[3]
+    else:
+        p[0] = [p[1] + p[2]]
+
+
 def p_sql_statement(p):
     '''sql_statement : select_statement
-                    | insert_statement
-                    | update_statement
-                    | delete_statement
-                     '''
+                     | insert_statement
+                     | update_statement
+                     | delete_statement'''
     p[0] = p[1]
 
+
 def p_select_statement(p):
-    '''select_statement : SELECT select_list FROM table_name opt_join_clause opt_where_clause opt_group_by_clause opt_order_by_clause opt_semicolon'''
+    '''select_statement : SELECT select_list FROM table_name opt_join_clause opt_where_clause opt_group_by_clause opt_order_by_clause '''
     p[0] = ' '.join([str(x) for x in p[1:] if x])
+
 
 def p_insert_statement(p):
-    '''insert_statement : INSERT INTO table_name opt_column_list VALUES LPAREN values_list RPAREN opt_semicolon'''
+    '''insert_statement : INSERT INTO table_name opt_column_list VALUES LPAREN values_list RPAREN '''
     p[0] = ' '.join([str(x) for x in p[1:] if x])
+
 
 def p_update_statement(p):
-    '''update_statement : UPDATE table_name SET set_list opt_where_clause opt_semicolon'''
+    '''update_statement : UPDATE table_name SET set_list opt_where_clause '''
     p[0] = ' '.join([str(x) for x in p[1:] if x])
 
+
 def p_delete_statement(p):
-    '''delete_statement : DELETE FROM table_name opt_where_clause opt_semicolon'''
+    '''delete_statement : DELETE FROM table_name opt_where_clause '''
     p[0] = ' '.join([str(x) for x in p[1:] if x])
+
 
 def p_opt_semicolon(p):
     '''opt_semicolon : SEMICOLON
                     | empty '''
     p[0] = p[1] if p[1] else ''
+
 
 def p_select_list(p):
     '''select_list : column_name
@@ -129,6 +144,8 @@ def p_value(p):
 
 def p_table_name(p):
     '''table_name : IDENTIFIER'''
+    global current_table_name
+    current_table_name = p[1]
     p[0] = p[1]
 
 def p_column_name(p):
@@ -278,10 +295,38 @@ def p_add_statement(p):
 
 def p_error(p):
     if p:
-        error_message = f"Syntax error at '{p.value}'"
+        # Uzyskiwanie poprzedniego tokenu ze stosu symboli
+        prev_token = parser.symstack[-1] if len(parser.symstack) > 1 else None
+        # Uzyskiwanie następnego tokenu jako bieżącego tokenu, ponieważ p jest bieżącym tokenem
+        next_token = p
+
+        if prev_token and prev_token.type == '$end':
+            error_message = f"Unexpected end of input after '{prev_token.value}' (line {p.lineno}, position {p.lexpos})"
+        elif next_token and next_token.type == '$end':
+            error_message = f"Unexpected end of input before '{next_token.value}' (line {p.lineno}, position {p.lexpos})"
+        elif prev_token and next_token:
+            error_message = (f"Syntax error near '{prev_token.value}' and '{next_token.value}' "
+                             f"(line {p.lineno}, position {p.lexpos})")
+        elif prev_token:
+            error_message = (f"Syntax error after '{prev_token.value}' "
+                             f"(line {p.lineno}, position {p.lexpos})")
+        elif next_token:
+            error_message = (f"Syntax error before '{next_token.value}' "
+                             f"(line {p.lineno}, position {p.lexpos})")
+        else:
+            error_message = (f"Syntax error at token '{p.value}' "
+                             f"(line {p.lineno}, position {p.lexpos})")
     else:
-        error_message = "Syntax error at EOF"
+        error_message = "Syntax error at EOF. Possibly missing keyword or token."
+
     raise SyntaxError(error_message)
+
+
+
 
 # Tworzenie parsera
 parser = yacc.yacc()
+
+def update():
+    parser = yacc.yacc()
+    return current_table_name
