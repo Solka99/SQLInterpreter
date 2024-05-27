@@ -261,29 +261,6 @@ def p_empty(p):
 #         error_message = "Syntax error at EOF"
 #     raise SyntaxError(error_message)
 
-# def p_error(p):
-#     if p:
-#         # Sprawdzenie otoczenia tokenu p, aby określić bardziej szczegółowy komunikat
-#         prev_token = parser.symstack[-2] if len(parser.symstack) > 1 else None
-#         next_token = parser.symstack[0] if len(parser.symstack) > 0 else None
-#
-#         if prev_token and next_token:
-#             error_message = (f"Syntax error near '{prev_token.value}' and '{next_token.value}' "
-#                              f"(line {p.lineno}, position {p.lexpos})")
-#         elif prev_token:
-#             error_message = (f"Syntax error after '{prev_token.value}' "
-#                              f"(line {p.lineno}, position {p.lexpos})")
-#         elif next_token:
-#             error_message = (f"Syntax error before '{next_token.value}' "
-#                              f"(line {p.lineno}, position {p.lexpos})")
-#         else:
-#             error_message = (f"Syntax error at token '{p.value}' "
-#                              f"(line {p.lineno}, position {p.lexpos})")
-#     else:
-#         error_message = "Syntax error at EOF. Possibly missing keyword or token."
-#
-#     raise SyntaxError(error_message)
-
 def p_error(p):
     if p:
         # Uzyskiwanie poprzedniego tokenu ze stosu symboli
