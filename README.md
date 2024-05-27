@@ -106,7 +106,6 @@ Do stworzenia GUI planujemy użycie Flask'a. Interfejs będzie zawierał:
     RENAME = 'RENAME'
     COLUMN = 'COLUMN'
     TO = 'TO'
-    MODIFY = 'MODIFY'
     REPLACE = 'REPLACE'
     HAVING = 'HAVING'
     NOT = 'NOT'
@@ -115,12 +114,11 @@ Do stworzenia GUI planujemy użycie Flask'a. Interfejs będzie zawierał:
     KEY = 'KEY'
     FOREIGN = 'FOREIGN'
     CHECK = 'CHECK'
-    ALL = 'ALL'
-    ANY = 'ANY'
     LIMIT = 'LIMIT'
     TOP = 'TOP'
     TRUNCATE = 'TRUNCATE'
     UNION = 'UNION'
+    DISTINCT = 'DISTINCT'
     
     
 ```

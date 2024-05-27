@@ -217,30 +217,42 @@ def p_empty(p):
 
 def p_create_statement(p):
     '''create : CREATE DATABASE database_name opt_semicolon
-                | CREATE TABLE table_name column_type_list opt_semicolon
+                | CREATE TABLE table_name create_table_list opt_semicolon
                 | CREATE TABLE table_name AS select_statement '''
-
+    if len(p) == 5:
+        p[0] = f"CREATE DATABASE {p[3]} {p[4]}"
+    elif p[4]=='AS':
+        p[0] = f"CREATE TABLE {p[3]} AS {p[5]}"
+    else:
+        p[0] = f"CREATE TABLE {p[3]} {p[4]} {p[5]}"
 def p_database_name(p):
     '''database_name: IDENTIFIER'''
     p[0] = p[1]
 
-def p_column_type_list(p):
-    '''column_type_list : LPAREN column_name_type_list RPAREN'''
-    p[0] = f"({p[2]})"
+def p_create_table_list(p):
+    '''create_table_list : LPAREN table_name_type_optconstraint_list opt_comma opt_constraint_list RPAREN'''
+    p[0] = f"({p[2]}{p[3]}{p[4]})"
 
-def p_column_name_type_list(p):
-    '''column_name_type_list : column_name column_type
-                        | column_name column_type COMMA column_name_type_list'''
-    if len(p) == 2:
-        p[0] = p[1]
+
+def p_table_name_type_optconstraint_list(p):
+    '''table_name_type_optconstraint_list : column_name column_type opt_constraint_clause
+                        | column_name column_type opt_constraint_clause COMMA table_name_type_optconstraint_list'''
+    if len(p) == 4:
+        p[0] = f"{p[1]}{p[2]}{p[3]}"
     else:
-        p[0] = f"{p[1]}, {p[3]}"
+        p[0] = f"{p[1]} {p[2]} {p[3]},{p[5]}"
 
 def p_column_type(p):
-    '''column_type : INT | INTEGER | FLOAT | DECIMAL | NUMERIC
-    | CHAR(NUMBER) | CHARACTER(NUMBER) | VARCHAR(NUMBER) | CHARACTER VARYING(NUMBER) | TEXT
-    | DATE | TIME | TIMESTAMP | DATETIME | INTERVAL
-    | BOOLEAN | BINARY(NUMBER)'''
+    '''column_type : INT | INTEGER | FLOAT | DOUBLE LEFTPAREN NUMBER COMMA NUMBER RIGHTPAREN | DECIMAL LEFTPAREN NUMBER COMMA NUMBER RIGHTPAREN | DEC LEFTPAREN NUMBER COMMA NUMBER RIGHTPAREN | NUMERIC
+    | CHAR LEFTPAREN NUMBER RIGHTPAREN | CHARACTER LEFTPAREN NUMBER RIGHTPAREN | VARCHAR LEFTPAREN NUMBER RIGHTPAREN | TEXT
+    | DATE | TIME | TIMESTAMP | DATETIME | INTERVAL | YEAR
+    | BOOL | BOOLEAN | BINARY LEFTPAREN NUMBER RIGHTPAREN | VARBINARY LEFTPAREN NUMBER RIGHTPAREN'''
+    if len(p) == 2:
+        p[0] = p[1]
+    elif len(p) == 7:
+        p[0] = f"{p[1]}(NUMBER,NUMBER)"
+    else:
+        p[0] = f"{p[1]}(NUMBER)"
 
 # def p_opt_column_type_list(p):
 #     '''opt_column_type_list : empty
@@ -248,13 +260,27 @@ def p_column_type(p):
 #     p[0] = p[1] if p[1] else ''
 
 def p_drop_statement(p):
-    '''drop: DROP COLUMN column_name
+    '''drop_statement: DROP COLUMN column_name
             | DROP CONSTRAINT constraint_name
             | DROP PRIMARY KEY
             | DROP FOREIGN KEY key_name
             | DROP CHECK check_name
             | DROP DATABASE database_name
             | DROP TABLE table_name'''
+    if p[2] == 'COLUMN':
+        p[0] = f"DROP COLUMN {p[3]}"
+    elif p[2] == 'CONSTRAINT':
+        p[0] = f"DROP CONSTRAINT {p[3]}"
+    elif p[2] == 'PRIMARY':
+        p[0] = f"DROP PRIMARY KEY"
+    elif p[2] == 'FOREIGN':
+        p[0] = f"DROP FOREIGN KEY {p[4]}"
+    elif p[2] == 'CHECK':
+        p[0] = f"DROP CHECK {p[3]}"
+    elif p[2] == 'DATABASE':
+        p[0] = f"DROP DATABASE {p[3]}"
+    else:
+        p[0] = f"DROP TABLE {p[3]}"
 
 def p_constraint_name(p):
     '''constraint_name: IDENTIFIER'''
@@ -271,10 +297,32 @@ def p_check_name(p):
 def p_alter(p):
     '''alter: ALTER TABLE table_name add_statement opt_semicolon
             | ALTER TABLE table_name drop_statement opt_semicolon
-            | ALTER TABLE table_name ALTER COLUMN column_name column_type'''
+            | ALTER TABLE table_name ALTER COLUMN column_name column_type opt_semicolon'''
+    if len(p) == 6:
+        p[0] = f"ALTER TABLE {p[3]}{p[4]}{p[5]}"
+    else:
+        p[0] = f"ALTER TABLE {p[3]} ALTER COLUMN {p[6]} {p[7]} {p[8]}"
 
 def p_add_statement(p):
-    '''add_statement: TODO'''
+    '''add_statement: ADD column_name column_type opt_semicolon
+                    | ADD constraint_clause opt_semicolon'''
+    if len(p) == 5:
+        p[0] = f"ADD {p[2]} {p[3]} {p[4]}"
+    else:
+        p[0] = f"ADD {p[2]}{p[3]}"
+
+def p_constraint_clause(p):
+    '''constraint_clause: CONSTRAINT constraint_name constraint_type'''
+    p[0] = f"CONSTRAINT {p[2]}{p[3]}"
+def p_constraint_type(p):
+    '''constraint_type: NOT NULL | UNIQUE LEFTPAREN column_name_list RIGHTPAREN'''
+
+def p_opt_constraint_type(p):
+    '''opt_constraint_type: empty | constraint_type'''
+    p[0]=p[1]
+def p_opt_constraint_list(p):
+    '''opt_constraint_list: empty | constraint_clause'''
+    p[0] = p[1]
 
 def p_error(p):
     if p:
