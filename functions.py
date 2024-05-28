@@ -1,7 +1,7 @@
 import sqlite3
 from grammar import update
 
-table_list=['students','COMPANY']
+table_list=['students','COMPANY','Persons','Persons2','Persons3','Persons5']
 def connect_db():
     conn = sqlite3.connect('students.db')  # Podaj ścieżkę do pliku bazy danych
     return conn
@@ -46,5 +46,7 @@ def check_if_table_name_correct(current_table_name_,create_bool):
 # HAVING avg(age) > 20;
 # 10 select students.major from students inner join COMPANY on students.id=COMPANY.id;
 #11 CREATE TABLE Persons (Id int UNIQUE, Age int);
+#12 CREATE TABLE Persons (ID int PRIMARY KEY, LastName text, FirstName text, Age int);
+#13 ALTER TABLE students ADD column_test TEXT;
 
 

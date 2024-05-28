@@ -20,7 +20,9 @@ def p_sql_statement(p):
                      | update_statement
                      | delete_statement
                      | union_statement
-                     | create_statement'''
+                     | create_statement
+                     | drop_statement
+                     | alter'''
     p[0] = p[1]
 
 def p_select_statement(p):
@@ -43,6 +45,72 @@ def p_union_statement(p):
     '''union_statement : select_statement UNION select_statement'''
 
     p[0] = f"{p[1]} UNION {p[3]}"
+
+def p_drop_statement(p):
+    '''drop_statement : DROP COLUMN column_name
+            | DROP CONSTRAINT constraint_name
+            | DROP PRIMARY KEY
+            | DROP FOREIGN KEY key_name
+            | DROP CHECK check_name
+            | DROP DATABASE database_name
+            | DROP TABLE table_name'''
+    if p[2] == 'COLUMN':
+        p[0] = f"DROP COLUMN {p[3]}"
+    elif p[2] == 'CONSTRAINT':
+        p[0] = f"DROP CONSTRAINT {p[3]}"
+    elif p[2] == 'PRIMARY':
+        p[0] = f"DROP PRIMARY KEY"
+    elif p[2] == 'FOREIGN':
+        p[0] = f"DROP FOREIGN KEY {p[4]}"
+    elif p[2] == 'CHECK':
+        p[0] = f"DROP CHECK {p[3]}"
+    elif p[2] == 'DATABASE':
+        p[0] = f"DROP DATABASE {p[3]}"
+    else:
+        p[0] = f"DROP TABLE {p[3]}"
+
+def p_key_name(p):
+    '''key_name : IDENTIFIER'''
+    p[0] = p[1]
+
+def p_check_name(p):
+    '''check_name : IDENTIFIER'''
+    p[0] = p[1]
+
+def p_alter(p):
+    '''alter : ALTER TABLE table_name add_statement
+            | ALTER TABLE table_name drop_statement
+            | ALTER TABLE table_name ALTER COLUMN column_name column_type
+            | ALTER TABLE table_name RENAME COLUMN column_name TO column_name'''
+    # if len(p) == 5:
+    #     p[0] = f"ALTER TABLE {p[3]}{p[4]}"
+    # elif len(p) == 9:
+    #     p[0] = f"ALTER TABLE {p[3]} RENAME COLUMN {p[6]} TO {p[7]}"
+    # else:
+    #     p[0] = f"ALTER TABLE {p[3]} ALTER COLUMN {p[6]} {p[7]}"
+    p[0] = ' '.join([str(x) for x in p[1:] if x])
+
+
+def p_add_statement(p):
+    '''add_statement : ADD column_name column_type
+                    | ADD constraint_clause
+                    | ADD UNIQUE LPAREN column_name RPAREN
+                    | ADD PRIMARY KEY LPAREN column_name RPAREN
+                    | ADD FOREIGN KEY LPAREN column_name RPAREN REFERENCES table_name LPAREN column_name RPAREN
+                    | ADD CHECK LPAREN expression RPAREN'''
+    # if len(p) == 4:
+    #     p[0] = f"ADD {p[2]} {p[3]}"
+    # elif len(p) == 6:
+    #     p[0] = f"ADD CHECK ({p[4]})"
+    # elif len(p) == 6:
+    #     p[0] = f"ADD UNIQUE ({p[4]})"
+    # elif len(p) == 7:
+    #     p[0] = f"ADD PRIMARY KEY ({p[5]})"
+    # elif len(p) == 12:
+    #     p[0] = f"ADD FOREIGN KEY ( {p[5]} ) REFERENCES {p[8]} ( {p[10]} )"
+    # else:
+    #     p[0] = f"ADD {p[2]}{p[3]}"
+    p[0] = ' '.join([str(x) for x in p[1:] if x])
 
 
 def p_opt_semicolon(p):
@@ -340,7 +408,7 @@ def p_column_type(p):
                    | NUMERIC
                    | TEXT
                    | BLOB
-                   | BOOLEAN'''
+                   | BOOLEAN_WORD'''
     p[0] = p[1]
 def p_constraint_name(p):
     '''constraint_name : IDENTIFIER'''
@@ -387,4 +455,4 @@ def update():
 
 #
 #print(parser.parse("CREATE TABLE Persons (Id int UNIQUE, Age int);"))
-#print(parser.parse("CREATE TABLE Persons (ID int PRIMARY KEY, LastName text, FirstName text, Age int);"))
+# print(parser.parse("ALTER TABLE Persons ADD Name TEXT;"))
