@@ -199,3 +199,18 @@ Do stworzenia GUI planujemy użycie Flask'a. Interfejs będzie zawierał:
 #### Krótka instrukcja obsługi
 W polu tekstowym należy wpisać zapytanie w języku SQL, które chcemy wykonać. Aby to się stało, należy wcisnąć klawisz ENTER lub kliknąć przycisk "Wykonaj zapytanie". Jeżeli zapytanie jest poprawne składniowo, to wyświetli się tabela, która jest wynikiem naszego zapytania. Jeśli zapytanie jest niepoprawne, wyświetli się komunikat "Błąd przy wykonywaniu zapytania".
 
+
+#### Przykładowe zapytania SQL
+```sql
+
+1. SELECT name AS student_name FROM students;
+2. select * from students2 where name='Kasia';
+3. update students set major='Computer Science' where age=21; select * from students;
+4. SELECT name, age FROM students ORDER BY age DESC;
+5. SELECT * FROM students WHERE major LIKE 'M%';
+6. SELECT count(*) from students where age>20; select * from students
+7. SELECT major,avg(age) as average_age FROM students GROUP BY major;
+8. SELECT * FROM students WHERE age = (SELECT MIN(age) FROM students) or age = (SELECT max(age) FROM students)
+9. SELECT major, AVG(age) AS average_age FROM students GROUP BY major HAVING avg(age) > 20;
+10. select students.major from students inner join COMPANY on students.id=COMPANY.id;
+``` 
