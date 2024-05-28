@@ -1,7 +1,7 @@
 import sqlite3
 from grammar import update
 
-table_list=['students']
+table_list=['students','COMPANY']
 def connect_db():
     conn = sqlite3.connect('students.db')  # Podaj ścieżkę do pliku bazy danych
     return conn

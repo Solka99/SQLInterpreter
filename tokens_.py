@@ -8,7 +8,7 @@ tokens = (
     'SEMICOLON', 'DOT', 'LPAREN', 'RPAREN', 'EQUALS', 'NOT_EQUALS',
     'LESS_THAN', 'LESS_OR_EQUAL', 'GREATER_THAN', 'GREATER_OR_EQUAL',
     'NUMBER', 'STRING', 'IDENTIFIER', 'INSERT', 'INTO','BOOLEAN','IS','NULL','UPDATE','SET','DELETE','VALUES','ALL',
-    'HAVING','DISTINCT','LIMIT'
+    'HAVING','DISTINCT','LIMIT','INT','INTEGER','REAL','NUMERIC','TEXT','BLOB',
 )
 
 # Definicje reguł leksykalnych
@@ -60,6 +60,12 @@ t_ALL=r'\*'
 t_HAVING=r'HAVING'
 t_DISTINCT=r'DISTINCT'
 t_LIMIT=r'LIMIT'
+t_INT=r'INT'
+t_INTEGER=r'INTEGER'
+t_REAL=r'REAL'
+t_NUMERIC=r'NUMERIC'
+t_TEXT=r'TEXT'
+t_BLOB=r'BLOB'
 
 def t_NUMBER(t):
     r'[0-9]+(\.[0-9]+)?'
