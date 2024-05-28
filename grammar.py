@@ -17,7 +17,8 @@ def p_sql_statement(p):
     '''sql_statement : select_statement
                      | insert_statement
                      | update_statement
-                     | delete_statement'''
+                     | delete_statement
+                     | union_statement'''
     p[0] = p[1]
 
 def p_select_statement(p):
@@ -35,6 +36,12 @@ def p_update_statement(p):
 def p_delete_statement(p):
     '''delete_statement : DELETE FROM table_name opt_where_clause '''
     p[0] = ' '.join([str(x) for x in p[1:] if x])
+
+def p_union_statement(p):
+    '''union_statement : select_statement UNION select_statement'''
+
+    p[0] = f"{p[1]} UNION {p[3]}"
+
 
 def p_opt_semicolon(p):
     '''opt_semicolon : SEMICOLON
@@ -169,10 +176,6 @@ def p_column_name(p):
         p[0]=f"{p[1]} . {p[3]}"
 
 
-def p_identifier(p):
-    '''identifier : IDENTIFIER'''
-    p[0] = p[1]
-
 
 def p_as_clause(p):
     '''as_clause : AS IDENTIFIER'''
@@ -252,6 +255,7 @@ def p_order_direction(p):
 
 def p_aggregate_function(p):
     '''aggregate_function : COUNT LPAREN column_name RPAREN
+                          | COUNT LPAREN ALL RPAREN
                           | SUM LPAREN column_name RPAREN
                           | AVG LPAREN column_name RPAREN
                           | MAX LPAREN column_name RPAREN
@@ -412,4 +416,4 @@ def update():
         pass
     return current_table_name
 
-print(parser.parse("select students.major from students inner join COMPANY on students.id=COMPANY.id;"))
+# print(parser.parse("select id from students union select id from COMPANY"))

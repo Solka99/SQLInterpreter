@@ -39,9 +39,10 @@ def check_if_table_name_correct(current_table_name_):
 #7 SELECT major,avg(age) as average_age FROM students GROUP BY major;
 #8 SELECT * FROM students WHERE age = (SELECT MIN(age) FROM students) or age = (SELECT max(age) FROM students)
 #9 SELECT major, AVG(age) AS average_age
-#FROM students
-#GROUP BY major
-#HAVING avg(age) > 20;
-
+# FROM students
+# GROUP BY major
+# HAVING avg(age) > 20;
+#10 select students.major from students inner join COMPANY on students.id=COMPANY.id;
+#11
 
 
