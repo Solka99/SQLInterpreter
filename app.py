@@ -13,6 +13,7 @@ def execute_query_route():
     data = request.get_json()
     sql_query = data.get('query', '')
     try:
+        grammar.create=False
         parsed_queries = grammar.parser.parse(sql_query)
         results = []
         for query in parsed_queries:

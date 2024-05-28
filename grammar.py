@@ -2,6 +2,7 @@ import ply.yacc as yacc
 from tokens_ import tokens
 
 current_table_name = None
+create=False
 
 # Definicje gramatyki
 def p_statements(p):
@@ -18,7 +19,8 @@ def p_sql_statement(p):
                      | insert_statement
                      | update_statement
                      | delete_statement
-                     | union_statement'''
+                     | union_statement
+                     | create_statement'''
     p[0] = p[1]
 
 def p_select_statement(p):
@@ -275,107 +277,74 @@ def p_empty(p):
     '''empty :'''
     p[0] = ''
 
-# def p_create_statement(p):
-#     '''create : CREATE DATABASE database_name opt_semicolon
-#                 | CREATE TABLE table_name create_table_list opt_semicolon
-#                 | CREATE TABLE table_name AS select_statement '''
-#     if len(p) == 5:
-#         p[0] = f"CREATE DATABASE {p[3]} {p[4]}"
-#     elif p[4]=='AS':
-#         p[0] = f"CREATE TABLE {p[3]} AS {p[5]}"
-#     else:
-#         p[0] = f"CREATE TABLE {p[3]} {p[4]} {p[5]}"
-# def p_database_name(p):
-#     '''database_name : IDENTIFIER'''
-#     p[0] = p[1]
-#
-# def p_create_table_list(p):
-#     '''create_table_list : LPAREN table_name_type_optconstraint_list opt_comma opt_constraint_list RPAREN'''
-#     p[0] = f"({p[2]}{p[3]}{p[4]})"
-#
-#
-# def p_table_name_type_optconstraint_list(p):
-#     '''table_name_type_optconstraint_list : column_name column_type opt_constraint_clause
-#                         | column_name column_type opt_constraint_clause COMMA table_name_type_optconstraint_list'''
-#     if len(p) == 4:
-#         p[0] = f"{p[1]}{p[2]}{p[3]}"
-#     else:
-#         p[0] = f"{p[1]} {p[2]} {p[3]},{p[5]}"
-#
-# def p_column_type(p):
-#     '''column_type : INT | INTEGER | REAL | NUMERIC | TEXT | BLOB | BOOLEAN'''
-#     p[0] = p[1]
-#
-#
-# # def p_opt_column_type_list(p):
-# #     '''opt_column_type_list : empty
-# #                        | column_type_list'''
-# #     p[0] = p[1] if p[1] else ''
-#
-# def p_drop_statement(p):
-#     '''drop_statement : DROP COLUMN column_name
-#             | DROP CONSTRAINT constraint_name
-#             | DROP PRIMARY KEY
-#             | DROP FOREIGN KEY key_name
-#             | DROP CHECK check_name
-#             | DROP DATABASE database_name
-#             | DROP TABLE table_name'''
-#     if p[2] == 'COLUMN':
-#         p[0] = f"DROP COLUMN {p[3]}"
-#     elif p[2] == 'CONSTRAINT':
-#         p[0] = f"DROP CONSTRAINT {p[3]}"
-#     elif p[2] == 'PRIMARY':
-#         p[0] = f"DROP PRIMARY KEY"
-#     elif p[2] == 'FOREIGN':
-#         p[0] = f"DROP FOREIGN KEY {p[4]}"
-#     elif p[2] == 'CHECK':
-#         p[0] = f"DROP CHECK {p[3]}"
-#     elif p[2] == 'DATABASE':
-#         p[0] = f"DROP DATABASE {p[3]}"
-#     else:
-#         p[0] = f"DROP TABLE {p[3]}"
-#
-# def p_constraint_name(p):
-#     '''constraint_name : IDENTIFIER'''
-#     p[0] = p[1]
-#
-# def p_key_name(p):
-#     '''key_name : IDENTIFIER'''
-#     p[0] = p[1]
-#
-# def p_check_name(p):
-#     '''check_name : IDENTIFIER'''
-#     p[0] = p[1]
-#
-# def p_alter(p):
-#     '''alter : ALTER TABLE table_name add_statement opt_semicolon
-#             | ALTER TABLE table_name drop_statement opt_semicolon
-#             | ALTER TABLE table_name ALTER COLUMN column_name column_type opt_semicolon'''
-#     if len(p) == 6:
-#         p[0] = f"ALTER TABLE {p[3]}{p[4]}{p[5]}"
-#     else:
-#         p[0] = f"ALTER TABLE {p[3]} ALTER COLUMN {p[6]} {p[7]} {p[8]}"
-#
-# def p_add_statement(p):
-#     '''add_statement : ADD column_name column_type opt_semicolon
-#                     | ADD constraint_clause opt_semicolon'''
-#     if len(p) == 5:
-#         p[0] = f"ADD {p[2]} {p[3]} {p[4]}"
-#     else:
-#         p[0] = f"ADD {p[2]}{p[3]}"
-#
-# def p_constraint_clause(p):
-#     '''constraint_clause : CONSTRAINT constraint_name constraint_type'''
-#     p[0] = f"CONSTRAINT {p[2]}{p[3]}"
-# def p_constraint_type(p):
-#     '''constraint_type : NOT NULL | UNIQUE LEFTPAREN column_name_list RIGHTPAREN'''
-#
-# def p_opt_constraint_type(p):
-#     '''opt_constraint_type : empty | constraint_type'''
-#     p[0]=p[1]
-# def p_opt_constraint_list(p):
-#     '''opt_constraint_list : empty | constraint_clause'''
-#     p[0] = p[1]
+def p_create_statement(p):
+    '''create_statement : CREATE DATABASE database_name
+                        | CREATE TABLE table_name LPAREN create_table_list RPAREN
+                        | CREATE TABLE table_name AS select_statement'''
+    global create
+    create=False
+    if len(p) == 4:
+        p[0] = f"CREATE DATABASE {p[3]}"
+    elif len(p) == 7:
+        p[0] = f"CREATE TABLE {p[3]} ({p[5]})"
+        create=True
+    else:
+        p[0] = f"CREATE TABLE {p[3]} AS {p[5]}"
+        create = True
+
+def p_database_name(p):
+    '''database_name : IDENTIFIER'''
+    p[0] = p[1]
+
+def p_create_table_list(p):
+    '''create_table_list : table_name_type_optconstraint_list
+                         | table_name_type_optconstraint_list COMMA create_table_list'''
+    if len(p) == 2:
+        p[0] = p[1]
+    else:
+        p[0] = f"{p[1]}, {p[3]}"
+
+def p_table_name_type_optconstraint_list(p):
+    '''table_name_type_optconstraint_list : column_name column_type opt_constraint_clause
+                                          | column_name column_type opt_constraint_clause COMMA table_name_type_optconstraint_list'''
+    if len(p) == 4:
+        p[0] = f"{p[1]} {p[2]} {p[3]}"
+    else:
+        p[0] = f"{p[1]} {p[2]} {p[3]}, {p[5]}"
+
+def p_opt_constraint_clause(p):
+    '''opt_constraint_clause : constraint_clause
+                             | empty'''
+    p[0] = p[1] if p[1] else ''
+
+def p_constraint_clause(p):
+    '''constraint_clause : PRIMARY KEY
+                         | UNIQUE
+                         | NOT NULL
+                         | CHECK LPAREN expression RPAREN
+                         | FOREIGN KEY LPAREN column_name RPAREN REFERENCES table_name LPAREN column_name RPAREN'''
+    # if len(p) == 3:
+    #     p[0] = f"{p[1]} {p[2]}"
+    # elif len(p) == 4:
+    #     p[0] = f"{p[1]} {p[2]} {p[3]}"
+    # elif len(p) == 5:
+    #     p[0] = f"{p[1]}({p[3]})"
+    # else:
+    #     p[0] = f"{p[1]} {p[2]}({p[4]}) REFERENCES {p[7]}({p[9]})"
+    p[0] = ' '.join([str(x) for x in p[1:] if x])
+
+def p_column_type(p):
+    '''column_type : INT
+                   | INTEGER
+                   | REAL
+                   | NUMERIC
+                   | TEXT
+                   | BLOB
+                   | BOOLEAN'''
+    p[0] = p[1]
+def p_constraint_name(p):
+    '''constraint_name : IDENTIFIER'''
+    p[0] = p[1]
 
 def p_error(p):
     if p:
@@ -407,13 +376,15 @@ def p_error(p):
 
 # Tworzenie parsera
 parser = yacc.yacc()
-
 def update():
     try:
         parser = yacc.yacc()
     except Exception as e:
         # Ignoruj wszystkie błędy
         pass
-    return current_table_name
+    return current_table_name,create
 
-# print(parser.parse("select id from students union select id from COMPANY"))
+
+#
+#print(parser.parse("CREATE TABLE Persons (Id int UNIQUE, Age int);"))
+#print(parser.parse("CREATE TABLE Persons (ID int PRIMARY KEY, LastName text, FirstName text, Age int);"))
